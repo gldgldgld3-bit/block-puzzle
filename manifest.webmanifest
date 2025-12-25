@@ -1,0 +1,22 @@
+{
+  "name": "블록 두뇌게임",
+  "short_name": "블록퍼즐",
+  "description": "컬러풀한 슬라이딩 퍼즐 두뇌게임",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d22",
+  "theme_color": "#4c5cff",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
