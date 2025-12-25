@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>블록 두뇌게임 (모바일/PC)</title>
+<style>
+  :root{
+    --bg1:#141a3a;
+    --bg2:#070816;
+    --panel1:#1c2454cc;
+    --panel2:#11173bcc;
+
+    --text:#f4f7ff;
+    --sub:#c6d0ff;
+
+    --btn:#4c5cff;
+    --btn2:#2fd3ff;
+    --btnHover:#6b79ff;
+    --active:#ffb347;
+
+    --tileShadow: 0 14px 28px rgba(0,0,0,.28);
+    --softShadow: 0 14px 40px rgba(0,0,0,.28);
+    --radius:18px;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    background:
+      radial-gradient(1200px 600px at 18% 30%, rgba(90,120,255,.22), transparent 60%),
+      radial-gradient(900px 500px at 82% 20%, rgba(255,180,70,.16), transparent 58%),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
+    color:var(--text);
+    overflow-x:hidden;
+  }
+
+  .wrapper{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns: 1fr 380px;
+    gap: 22px;
+    align-items:center;
+    padding: 22px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .leftArea{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: 10px;
+  }
+
+  .rightArea{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: 10px;
+  }
+
+  /* 카드(컨트롤 패널) */
+  .card{
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, var(--panel1), var(--panel2));
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: var(--radius);
+    box-shadow: var(--softShadow);
+    padding: 18px 16px 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .titleRow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom: 10px;
+  }
+  .titleRow .emoji{
+    font-size: 28px;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+  }
+  h1{
+    font-size: 26px;
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  .subtitle{
+    margin: 8px 0 14px;
+    color: var(--sub);
+    font-size: 13px;
+    text-align:center;
+  }
+
+  .section{
+    display:grid;
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .rowLabel{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color: rgba(255,255,255,.88);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .rowLabel span.small{
+    font-weight:600;
+    color: rgba(255,255,255,.68);
+    font-size: 12px;
+  }
+
+  .btnRow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  button{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    background: linear-gradient(180deg, rgba(76,92,255,.95), rgba(52,64,200,.95));
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+    box-shadow: 0 10px 18px rgba(0,0,0,.22);
+    user-select:none;
+  }
+  button:hover{ filter: brightness(1.08); }
+  button:active{ transform: translateY(1px) scale(.99); }
+
+  button.active{
+    color:#1a1a22;
+    background: linear-gradient(180deg, rgba(255,193,98,1), rgba(255,160,60,1));
+    box-shadow: 0 10px 18px rgba(255,175,80,.20), 0 16px 32px rgba(0,0,0,.25);
+  }
+
+  button.ghost{
+    background: linear-gradient(180deg, rgba(47,211,255,.92), rgba(0,160,210,.92));
+  }
+
+  .actions{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .infoBox{
+    margin-top: 14px;
+    padding: 12px 12px;
+    border-radius: 14px;
+    background: rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.08);
+    color: rgba(255,255,255,.92);
+    font-weight: 700;
+  }
+  .infoBox .small{
+    margin-top: 6px;
+    font-weight: 600;
+    color: rgba(255,255,255,.70);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  /* 보드 */
+  .boardWrap{
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: var(--softShadow);
+    backdrop-filter: blur(8px);
+  }
+
+  #board{
+    display:grid;
+    gap: 10px;
+    touch-action: manipulation;
+  }
+
+  .tile{
+    width: var(--tileSize);
+    height: var(--tileSize);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size: calc(var(--tileSize) * .38);
+    font-weight: 900;
+    border-radius: 18px;
+    user-select:none;
+    position: relative;
+    box-shadow: var(--tileShadow);
+    transition: transform .12s ease, filter .12s ease;
+  }
+
+  .tile:active{ transform: scale(.98); }
+
+  .tile::before{
+    content:"";
+    position:absolute;
+    inset: 7px 8px auto 8px;
+    height: 38%;
+    border-radius: 16px;
+    background: rgba(255,255,255,.22);
+    filter: blur(.2px);
+    pointer-events:none;
+  }
+
+  .tile.movable{
+    outline: 3px solid rgba(47,211,255,.85);
+    box-shadow: 0 0 0 6px rgba(47,211,255,.16), var(--tileShadow);
+    transform: translateY(-1px);
+  }
+
+  .tile.movable:hover{
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+  }
+
+  .blank{
+    background: rgba(0,0,0,.20);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.06);
+  }
+
+  /* 모바일 */
+  @media (max-width: 920px){
+    .wrapper{
+      grid-template-columns: 1fr;
+      align-items: start;
+      padding: 16px;
+    }
+    .rightArea{
+      order: -1;
+    }
+    .card{
+      max-width: 520px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- LEFT: BOARD -->
+  <div class="leftArea">
+    <div class="boardWrap">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS -->
+  <div class="rightArea">
+    <div class="card">
+      <div class="titleRow">
+        <div class="emoji">🧠</div>
+        <h1>블록 두뇌게임</h1>
+      </div>
+      <div class="subtitle">모바일/PC 공용 · 터치/마우스 지원 · 설치 없이 실행</div>
+
+      <div class="section">
+        <div class="rowLabel">
+          <span>난이도</span>
+          <span class="small">보드 크기</span>
+        </div>
+        <div class="btnRow">
+          <button id="b3" onclick="setSize(3, this)">3x3</button>
+          <button id="b4" class="active" onclick="setSize(4, this)">4x4</button>
+          <button id="b5" onclick="setSize(5, this)">5x5</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="rowLabel">
+          <span>셔플</span>
+          <span class="small">난이도 체감</span>
+        </div>
+        <div class="btnRow">
+          <button id="sEasy" onclick="setShuffle('easy', this)">쉬움</button>
+          <button id="sMid" class="active" onclick="setShuffle('mid', this)">보통</button>
+          <button id="sHard" onclick="setShuffle('hard', this)">어려움</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" onclick="shuffle()">🔀 셔플</button>
+        <button onclick="reset()">♻ 리셋</button>
+      </div>
+
+      <div class="infoBox" id="info">
+        이동: 0 · 시간: 0s
+        <div class="small" id="hintText">빈칸과 인접한 블록만 움직일 수 있어요.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========= 상태 ========= */
+let size = 4;                 // 3/4/5
+let shuffleMode = "mid";      // easy/mid/hard
+let shuffleCount = 120;
+let board = [];
+let moves = 0;
+let startTime = Date.now();
+let timerHandle = null;
+
+const colors = ["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ff924c","#39cccc"];
+
+function setActive(groupButtons, btn){
+  groupButtons.forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function applyShufflePreset(){
+  const preset = {
+    easy: {3: 30, 4: 60, 5: 120},
+    mid:  {3: 80, 4: 180, 5: 300},
+    hard: {3: 180,4: 420, 5: 700},
+  };
+  shuffleCount = preset[shuffleMode][size];
+}
+
+function setSize(n, btn){
+  size = n;
+  setActive([b3,b4,b5], btn);
+  applyShufflePreset();
+  shuffle(); // 난이도 바꾸면 자동 셔플
+}
+
+function setShuffle(mode, btn){
+  shuffleMode = mode;
+  setActive([sEasy,sMid,sHard], btn);
+  applyShufflePreset();
+}
+
+function reset(){
+  board = [];
+  for(let i=1;i<size*size;i++) board.push(i);
+  board.push(0);
+  moves = 0;
+  startTime = Date.now();
+  ensureTimer();
+  render();
+}
+
+function shuffle(){
+  reset();
+  // 풀 수 있는 상태: 해결 상태에서 합법 이동만 반복
+  for(let i=0;i<shuffleCount;i++){
+    const blank = board.indexOf(0);
+    const ns = getNeighbors(blank);
+    const pick = ns[Math.floor(Math.random()*ns.length)];
+    swap(blank, pick);
+  }
+  moves = 0; // 셔플 후 이동 수 초기화(게임 시작 기준)
+  startTime = Date.now();
+  render();
+}
+
+function ensureTimer(){
+  if(timerHandle) return;
+  timerHandle = setInterval(()=>updateInfo(), 250);
+}
+
+function swap(a,b){
+  const t = board[a];
+  board[a] = board[b];
+  board[b] = t;
+}
+
+function getNeighbors(i){
+  const r = Math.floor(i/size);
+  const c = i % size;
+  const n = [];
+  if(r>0) n.push(i-size);
+  if(r<size-1) n.push(i+size);
+  if(c>0) n.push(i-1);
+  if(c<size-1) n.push(i+1);
+  return n;
+}
+
+function clickTile(i){
+  const blank = board.indexOf(0);
+  if(!getNeighbors(blank).includes(i)) return;
+  swap(blank, i);
+  moves++;
+  render();
+  if(isSolved()){
+    setTimeout(()=>alert("🎉 완료!"), 50);
+  }
+}
+
+function isSolved(){
+  for(let i=0;i<size*size-1;i++){
+    if(board[i] !== i+1) return false;
+  }
+  return board[size*size-1] === 0;
+}
+
+function updateInfo(){
+  const t = Math.floor((Date.now()-startTime)/1000);
+  const info = document.getElementById("info");
+  info.firstChild.nodeValue = `이동: ${moves} · 시간: ${t}s`;
+}
+
+function render(){
+  const boardDiv = document.getElementById("board");
+
+  // 타일 크기: 화면 너비/난이도에 따라 자동
+  // (보드가 항상 가운데, 모바일에서도 보기 좋게)
+  const maxBoardPx = Math.min(window.innerWidth * 0.86, 520);
+  const tileSize = Math.floor((maxBoardPx - (size-1)*10) / size);
+  boardDiv.style.setProperty("--tileSize", tileSize + "px");
+  boardDiv.style.gridTemplateColumns = `repeat(${size}, ${tileSize}px)`;
+
+  boardDiv.innerHTML = "";
+
+  const blank = board.indexOf(0);
+  const movableSet = new Set(getNeighbors(blank));
+
+  board.forEach((v,i)=>{
+    const d = document.createElement("div");
+    d.className = "tile";
+
+    if(v === 0){
+      d.classList.add("blank");
+    }else{
+      d.textContent = v;
+      d.style.background = colors[(v-1) % colors.length];
+      d.style.color = "#14141c";
+
+      if(movableSet.has(i)){
+        d.classList.add("movable");
+      }
+
+      // 클릭/터치
+      d.addEventListener("click", ()=>clickTile(i), {passive:true});
+    }
+    boardDiv.appendChild(d);
+  });
+
+  updateInfo();
+}
+
+window.addEventListener("resize", render);
+
+/* 초기 세팅 */
+applyShufflePreset();
+shuffle();
+</script>
+
+</body>
+</html>
