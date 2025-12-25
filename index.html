@@ -465,6 +465,11 @@ window.addEventListener("resize", render);
 applyShufflePreset();
 shuffle();
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
 
 </body>
 </html>
