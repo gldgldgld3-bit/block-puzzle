@@ -1,4 +1,5 @@
 {
+  "id": "/block-puzzle/",
   "name": "블록 두뇌게임",
   "short_name": "블록퍼즐",
   "description": "컬러풀한 슬라이딩 퍼즐 두뇌게임",
@@ -7,25 +8,12 @@
   "orientation": "portrait",
   "background_color": "#0b0d22",
   "theme_color": "#4c5cff",
-  "categories": ["games", "puzzle"]
-  "id": "/block-puzzle/"
-"screenshots": [
-  {
-    "src": "screenshot1.png",
-    "sizes": "540x720",
-    "type": "image/png"
-  }
-]
+  "categories": ["games", "puzzle"],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "screenshots": [
+    { "src": "screenshot1.png", "sizes": "540x720", "type": "image/png" }
   ]
 }
